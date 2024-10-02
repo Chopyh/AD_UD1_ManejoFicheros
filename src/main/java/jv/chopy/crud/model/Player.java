@@ -9,7 +9,7 @@ import java.io.Serializable;
  * @author Javier Vázquez
  * @version 1.0
  */
-public class Player implements Serializable {
+public class Player implements Serializable, Comparable<Player> {
     private static final long serialVersionUID = 1L;
 
     private int id;
@@ -110,5 +110,30 @@ public class Player implements Serializable {
      */
     public void setCoins(int coins) {
         this.coins = coins;
+    }
+
+    /**
+     * Returns a string representation of the player.
+     *
+     * @return a string representation of the player
+     */
+    @Override
+    public String toString() {
+        return "Player{" +
+                "id=" + id +
+                ", nick_name='" + nick_name + '\'' +
+                ", experience=" + experience +
+                ", coins=" + coins +
+                '}';
+    }
+
+    @Override
+    public int compareTo(Player o) {
+        if (this.id < o.id) {
+            return -1;
+        } else if (this.id > o.id) {
+            return 1;
+        }
+        return 0;
     }
 }
