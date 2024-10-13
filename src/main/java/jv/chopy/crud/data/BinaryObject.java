@@ -4,6 +4,8 @@ import jv.chopy.crud.model.Player;
 import jv.chopy.crud.utils.PropertiesLoader;
 
 import java.io.*;
+import java.util.Collection;
+import java.util.TreeSet;
 
 public class BinaryObject {
 
@@ -15,7 +17,7 @@ public class BinaryObject {
      * @param object the object to be serialized
      * @throws IOException if an I/O error occurs
      */
-    public static void serialize(Object object) throws IOException {
+    public static void serialize(TreeSet<Player> object) throws IOException {
         assert filePath != null;
 
         if (object == null) {
@@ -36,11 +38,11 @@ public class BinaryObject {
      * @throws IOException if an I/O error occurs
      * @throws ClassNotFoundException if the class of the deserialized object cannot be found
      */
-    public static <T> T deserialize() throws IOException, ClassNotFoundException {
+    public static Collection<Player> deserialize() throws IOException, ClassNotFoundException {
         assert filePath != null;
         try (FileInputStream fileIn = new FileInputStream(filePath);
              ObjectInputStream in = new ObjectInputStream(fileIn)) {
-            return (T) in.readObject();
+            return (TreeSet<Player>) in.readObject();
         }
     }
 }

@@ -1,8 +1,11 @@
 package jv.chopy.crud.dao;
 
+import jv.chopy.crud.data.*;
 import jv.chopy.crud.model.Player;
+import jv.chopy.crud.utils.PropertiesLoader;
 
-import java.util.HashSet;
+import java.util.Collection;
+import java.util.TreeSet;
 import java.util.Optional;
 
 /**
@@ -14,13 +17,38 @@ import java.util.Optional;
  */
 public class PlayerDAO implements I_DAO<Player> {
 
-    private HashSet<Player> players;
+    private TreeSet<Player> players;
 
     /**
      * Constructs a new PlayerDAO with an empty set of players.
      */
     public PlayerDAO() {
-        players = new HashSet<>();
+
+        String exportType = PropertiesLoader.getProperty("app.export");
+
+        try {
+            switch (exportType) {
+                case "text.secuential":
+                    players = new SecuentialText().deserialize();
+                    break;
+                case "binary.secuential":
+                    players = (TreeSet<Player>) new BinarySecuential().deserialize();
+                    break;
+                case "binary.object":
+                    players = (TreeSet<Player>) BinaryObject.deserialize();
+                    break;
+                case "binary.random":
+                    players = BinaryRandom.readRandomFile();
+                    break;
+                case "json":
+                    players = (TreeSet<Player>) new JSON().deserializeToSet();
+                    break;
+                default:
+                    players = new TreeSet<>();
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
     }
 
     /**
@@ -53,8 +81,10 @@ public class PlayerDAO implements I_DAO<Player> {
      */
     @Override
     public void update(Player player) {
-        delete(player.getId());
-        create(player);
+        if (players.contains(player)) {
+            players.remove(player);
+            players.add(player);
+        }
     }
 
     /**
@@ -65,5 +95,45 @@ public class PlayerDAO implements I_DAO<Player> {
     @Override
     public void delete(int id) {
         players.removeIf(player -> player.getId() == id);
+    }
+
+    /**
+     * Gets all players.
+     *
+     * @return a collection of all players
+     */
+    public Collection<Player> getPlayers() {
+        return players;
+    }
+
+    /**
+     * Exports the players data to the specified format.
+     */
+    public void export() {
+        String exportType = PropertiesLoader.getProperty("app.export");
+
+        try {
+            switch (exportType) {
+                case "text.secuential":
+                    SecuentialText.serialize(players);
+                    break;
+                case "binary.secuential":
+                    BinarySecuential.serialize(players);
+                    break;
+                case "binary.object":
+                    BinaryObject.serialize(players);
+                    break;
+                case "binary.random":
+                    BinaryRandom.generateRandomFile(players);
+                    break;
+                case "json":
+                    new JSON().exportToJsonFile(players);
+                    break;
+                default:
+                    System.out.println("Invalid export type.");
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
     }
 }

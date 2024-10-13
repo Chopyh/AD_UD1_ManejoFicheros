@@ -5,12 +5,13 @@ import jv.chopy.crud.utils.PropertiesLoader;
 
 import java.io.IOException;
 import java.io.RandomAccessFile;
-import java.util.Random;
+import java.util.TreeSet;
 
 /**
  * Serialize and deserialize Player object to binary file using RandomAccessFile.
  *
- * TODO: DO THIS CLASS
+ * @author Javier Vázquez
+ * @version 1.0
  */
 public class BinaryRandom {
 
@@ -19,16 +20,19 @@ public class BinaryRandom {
     /**
      * Generates a file with random Player objects.
      *
-     * @param count the number of random Player objects to generate
+     * @param players the set of Players
      * @throws IOException if an I/O error occurs
      */
-    public void generateRandomFile(int count) throws IOException {
+    public static void generateRandomFile(TreeSet<Player> players) throws IOException {
         try (RandomAccessFile raf = new RandomAccessFile(FILE_PATH, "rw")) {
-            Random random = new Random();
-            for (int i = 0; i < count; i++) {
-                Player player = new Player(random.nextInt(), "Player" + i, random.nextInt(1000), random.nextInt(500));
+            if(players.isEmpty()) {
+                raf.setLength(0);
+            }
+            for (Player player : players) {
                 raf.writeInt(player.getId());
-                raf.writeUTF(player.getNick_name());
+                StringBuffer sb = new StringBuffer(player.getNick_name());
+                sb.setLength(16);
+                raf.writeChars(sb.toString());
                 raf.writeInt(player.getExperience());
                 raf.writeInt(player.getCoins());
             }
@@ -38,19 +42,23 @@ public class BinaryRandom {
     /**
      * Reads Player objects from the generated file.
      *
-     * @return an array of Player objects read from the file
+     * @return a tree of Player objects read from the file
      * @throws IOException if an I/O error occurs
      */
-    public Player[] readRandomFile() throws IOException {
+    public static TreeSet<Player> readRandomFile() throws IOException {
         try (RandomAccessFile raf = new RandomAccessFile(FILE_PATH, "r")) {
-            int count = (int) (raf.length() / (Integer.BYTES * 3 + 2)); // Approximate size of each Player object
-            Player[] players = new Player[count];
+            int count = (int) (raf.length() / (Integer.BYTES * 3 + 16 * 2));
+            TreeSet<Player> players = new TreeSet<>();
             for (int i = 0; i < count; i++) {
                 int id = raf.readInt();
-                String nick_name = raf.readUTF();
+                char[] nick_nameChars = new char[16];
+                for (int j = 0; j < 16; j++) {
+                    nick_nameChars[j] = raf.readChar();
+                }
+                String nick_name = new String(nick_nameChars).trim();
                 int experience = raf.readInt();
                 int coins = raf.readInt();
-                players[i] = new Player(id, nick_name, experience, coins);
+                players.add(new Player(id, nick_name, experience, coins));
             }
             return players;
         }

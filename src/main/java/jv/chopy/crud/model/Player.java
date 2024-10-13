@@ -136,4 +136,9 @@ public class Player implements Serializable, Comparable<Player> {
         }
         return 0;
     }
+
+    public static void playerHeader() {
+        System.out.printf("%-15s|%-15s|%-15s|%-15s%n", "ID", "NICKNAME", "EXPERIENCE", "COINS");
+        System.out.printf("%60s%n", "=".repeat(60));
+    }
 }

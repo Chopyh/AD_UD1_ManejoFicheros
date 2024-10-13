@@ -6,6 +6,7 @@ import jv.chopy.crud.utils.PropertiesLoader;
 import java.io.*;
 import java.util.HashSet;
 import java.util.Set;
+import java.util.TreeSet;
 
 /**
  * Serialize and deserialize Player objects to a text file sequentially.
@@ -20,7 +21,7 @@ public class SecuentialText {
      * @param players the list of Player objects to be serialized
      * @throws IOException if an I/O error occurs
      */
-    public void serialize(Set<Player> players) throws IOException {
+    public static void serialize(Set<Player> players) throws IOException {
         assert FILE_PATH != null;
 
         if (players == null) {
@@ -41,10 +42,10 @@ public class SecuentialText {
      * @return the Set of deserialized Player objects
      * @throws IOException if an I/O error occurs
      */
-    public Set<Player> deserialize() throws IOException {
+    public static TreeSet<Player> deserialize() throws IOException {
         assert FILE_PATH != null;
 
-        Set<Player> players = new HashSet<>();
+        TreeSet<Player> players = new TreeSet<>();
         try (BufferedReader reader = new BufferedReader(new FileReader(FILE_PATH))) {
             String line;
             while ((line = reader.readLine()) != null) {

@@ -4,8 +4,8 @@ import jv.chopy.crud.model.Player;
 import jv.chopy.crud.utils.PropertiesLoader;
 
 import java.io.*;
-import java.util.HashSet;
 import java.util.Set;
+import java.util.TreeSet;
 
 /**
  * Serialize and deserialize Player objects to a binary file sequentially.
@@ -20,7 +20,7 @@ public class BinarySecuential {
      * @param players the set of Player objects to be serialized
      * @throws IOException if an I/O error occurs
      */
-    public void serialize(Set<Player> players) throws IOException {
+    public static void serialize(Set<Player> players) throws IOException {
         assert FILE_PATH != null;
 
         if (players == null) {
@@ -42,10 +42,10 @@ public class BinarySecuential {
      * @throws IOException if an I/O error occurs
      * @throws ClassNotFoundException if the class of a deserialized object cannot be found
      */
-    public Set<Player> deserialize() throws IOException, ClassNotFoundException {
+    public static TreeSet<Player> deserialize() throws IOException, ClassNotFoundException {
         assert FILE_PATH != null;
 
-        Set<Player> players = new HashSet<>();
+        TreeSet<Player> players = new TreeSet<>();
         try (FileInputStream fileIn = new FileInputStream(FILE_PATH);
              ObjectInputStream in = new ObjectInputStream(fileIn)) {
             while (fileIn.available() > 0) {
